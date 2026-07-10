@@ -15,41 +15,25 @@ const PRESET_MODELS = [
   { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
   { label: 'GLM 5P2', id: 'accounts/fireworks/models/glm-5p2' },
   { label: 'DeepSeek V4 Pro', id: 'accounts/fireworks/models/deepseek-v4-pro' },
-  { label: 'Custom', id: '' },
 ];
+
+function modelLabel(modelId: string) {
+  if (modelId.includes('kimi-k2p7')) return 'Kimi K2P7';
+  if (modelId.includes('glm-5p2')) return 'GLM 5P2';
+  if (modelId.includes('deepseek-v4')) return 'DeepSeek V4';
+  return modelId.split('/').pop()?.slice(0, 18) || 'Model';
+}
 
 export default function App() {
   const [showSettings, setShowSettings] = useState(false);
-  const [modelInput, setModelInput] = useState(getStoredModel());
+  const [activeModel, setActiveModel] = useState(getStoredModel());
   const [diagResults, setDiagResults] = useState<DiagResult[] | null>(null);
   const [diagRunning, setDiagRunning] = useState(false);
-  const [modelSaved, setModelSaved] = useState(false);
 
   function handleModelSelect(modelId: string) {
-    setModelInput(modelId);
-    if (modelId) {
-      storeModel(modelId);
-      setModelSaved(true);
-      setTimeout(() => setModelSaved(false), 2000);
-    }
+    setActiveModel(modelId);
+    storeModel(modelId);
   }
-
-  function handleSaveModel() {
-    const trimmed = modelInput.trim();
-    if (trimmed) {
-      storeModel(trimmed);
-      setModelSaved(true);
-      setTimeout(() => setModelSaved(false), 2000);
-    }
-  }
-
-  function handleCustomClick() {
-    const stored = getStoredModel();
-    const isAlreadyCustom = !PRESET_MODELS.some((m) => m.id && m.id === stored);
-    setModelInput(isAlreadyCustom ? stored : '');
-  }
-
-  const isCustomMode = !PRESET_MODELS.some((m) => m.id && m.id === modelInput);
 
   async function runDiagnostics() {
     setDiagRunning(true);
@@ -81,14 +65,10 @@ export default function App() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            {/* Model/Settings button */}
             {/* Active model chip */}
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted border border-border text-xs text-secondary font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              {getStoredModel().includes('kimi-k2p7') ? 'Kimi K2P7' :
-               getStoredModel().includes('glm-5p2') ? 'GLM 5P2' :
-               getStoredModel().includes('deepseek-v4') ? 'DeepSeek V4' :
-               getStoredModel().split('/').pop()?.slice(0, 18) || 'Model'}
+              {modelLabel(activeModel)}
             </span>
 
             <button
@@ -120,61 +100,19 @@ export default function App() {
                 <div className="flex flex-wrap gap-1.5 flex-1">
                   {PRESET_MODELS.map((m) => (
                     <button
-                      key={m.id || 'custom'}
-                      onClick={() => m.id ? handleModelSelect(m.id) : handleCustomClick()}
+                      key={m.id}
+                      onClick={() => handleModelSelect(m.id)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 hover:scale-[0.97] active:scale-[0.95]
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
-                        ${!m.id ? 'italic' : ''}
-                        ${m.id
-                          ? modelInput === m.id
-                            ? 'bg-primary text-on-primary'
-                            : 'bg-surface border border-border text-secondary hover:text-foreground hover:border-foreground/30'
-                          : isCustomMode
-                            ? 'bg-primary/15 text-primary border border-primary/30'
-                            : 'text-tertiary border border-transparent'}`}
+                        ${activeModel === m.id
+                          ? 'bg-primary text-on-primary'
+                          : 'bg-surface border border-border text-secondary hover:text-foreground hover:border-foreground/30'}`}
                     >
                       {m.label}
                     </button>
                   ))}
                 </div>
               </div>
-
-              {/* Custom model input (shown when Custom is selected or model doesn't match presets) */}
-              {isCustomMode && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <label htmlFor="custom-model" className="text-xs font-medium text-secondary whitespace-nowrap">
-                      Custom Model ID
-                    </label>
-                    <input
-                      id="custom-model"
-                      type="text"
-                      value={modelInput}
-                      onChange={(e) => setModelInput(e.target.value)}
-                      placeholder="accounts/fireworks/models/your-model-name"
-                      className="flex-1 w-full px-3 py-1.5 rounded-lg border border-border bg-surface text-sm text-foreground
-                        placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    />
-                    <button
-                      onClick={handleSaveModel}
-                      disabled={!modelInput.trim()}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-on-primary hover:brightness-110
-                        disabled:opacity-40 disabled:cursor-not-allowed
-                        transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                    >
-                      Apply Model
-                    </button>
-                  </div>
-                  {modelSaved && (
-                    <p className="text-xs text-green-500 flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                      Model saved successfully!
-                    </p>
-                  )}
-                </div>
-              )}
 
               {/* Diagnostics */}
               <div className="border-t border-border mt-4 pt-4">
