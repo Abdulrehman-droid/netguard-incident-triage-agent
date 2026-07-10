@@ -7,12 +7,6 @@ const STORAGE_KEY = 'netguard_fireworks_key';
 const MODEL_KEY = 'netguard_model_name';
 const DEFAULT_MODEL = CONFIG_DEFAULT_MODEL;
 
-// Known valid model IDs — helps catch stale localStorage entries
-// Only models confirmed deployed on this account
-const VALID_MODEL_IDS = [
-  'accounts/fireworks/models/gemma-4-26b-a4b-it',
-];
-
 export function getStoredApiKey(): string {
   // Prefer the hardcoded config key — no user setup needed
   return FIREWORKS_API_KEY || localStorage.getItem(STORAGE_KEY) || '';
@@ -28,11 +22,6 @@ export function clearApiKey(): void {
 
 export function getStoredModel(): string {
   const stored = localStorage.getItem(MODEL_KEY);
-  // If the stored model is invalid (not a known Fireworks model path), reset to default
-  if (stored && !stored.startsWith('accounts/fireworks/models/')) {
-    localStorage.removeItem(MODEL_KEY);
-    return DEFAULT_MODEL;
-  }
   return stored || DEFAULT_MODEL;
 }
 
@@ -127,15 +116,18 @@ export async function testModel(modelId: string): Promise<{ ok: boolean; status:
 /** List of model IDs to try during diagnostics */
 export const DIAGNOSTIC_MODELS = [
   // Only models deployed on this account
-  { label: 'Gemma 4 26B', id: 'accounts/fireworks/models/gemma-4-26b-a4b-it' },
+  { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
+  { label: 'DeepSeek V3', id: 'accounts/fireworks/models/deepseek-v3' },
+  { label: 'DeepSeek R1', id: 'accounts/fireworks/models/deepseek-r1' },
 ];
 
 export async function analyzeLogs(
   logFormat: LogFormat,
-  logContent: string
+  logContent: string,
+  modelOverride?: string
 ): Promise<IncidentReport> {
   const apiKey = getApiKey();
-  const model = getStoredModel();
+  const model = modelOverride || getStoredModel();
 
   try {
     const response = await fetch(FIREWORKS_API, {

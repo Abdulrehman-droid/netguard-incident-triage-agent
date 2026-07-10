@@ -12,7 +12,9 @@ interface DiagResult {
 }
 
 const PRESET_MODELS = [
-  { label: 'Gemma 4 26B', id: 'accounts/fireworks/models/gemma-4-26b-a4b-it' },
+  { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
+  { label: 'DeepSeek V3', id: 'accounts/fireworks/models/deepseek-v3' },
+  { label: 'DeepSeek R1', id: 'accounts/fireworks/models/deepseek-r1' },
   { label: 'Custom', id: '' },
 ];
 
@@ -21,11 +23,14 @@ export default function App() {
   const [modelInput, setModelInput] = useState(getStoredModel());
   const [diagResults, setDiagResults] = useState<DiagResult[] | null>(null);
   const [diagRunning, setDiagRunning] = useState(false);
+  const [modelSaved, setModelSaved] = useState(false);
 
   function handleModelSelect(modelId: string) {
     setModelInput(modelId);
     if (modelId) {
       storeModel(modelId);
+      setModelSaved(true);
+      setTimeout(() => setModelSaved(false), 2000);
     }
   }
 
@@ -33,8 +38,16 @@ export default function App() {
     const trimmed = modelInput.trim();
     if (trimmed) {
       storeModel(trimmed);
+      setModelSaved(true);
+      setTimeout(() => setModelSaved(false), 2000);
     }
   }
+
+  function handleCustomClick() {
+    setModelInput('');
+  }
+
+  const isCustomMode = !PRESET_MODELS.some((m) => m.id && m.id === modelInput);
 
   async function runDiagnostics() {
     setDiagRunning(true);
@@ -67,6 +80,15 @@ export default function App() {
 
           <div className="ml-auto flex items-center gap-2">
             {/* Model/Settings button */}
+            {/* Active model chip */}
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted border border-border text-xs text-secondary font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              {getStoredModel().includes('kimi-k2p7') ? 'Kimi K2P7' :
+               getStoredModel().includes('deepseek-v3') ? 'DeepSeek V3' :
+               getStoredModel().includes('deepseek-r1') ? 'DeepSeek R1' :
+               getStoredModel().split('/').pop()?.slice(0, 18) || 'Model'}
+            </span>
+
             <button
               onClick={() => setShowSettings(!showSettings)}
               className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 hover:scale-[0.97] active:scale-[0.95]
@@ -97,9 +119,10 @@ export default function App() {
                   {PRESET_MODELS.map((m) => (
                     <button
                       key={m.id || 'custom'}
-                      onClick={() => handleModelSelect(m.id)}
+                      onClick={() => m.id ? handleModelSelect(m.id) : handleCustomClick()}
                       className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 hover:scale-[0.97] active:scale-[0.95]
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
+                        ${!m.id ? 'text-tertiary italic' : ''}
                         ${modelInput === m.id
                           ? 'bg-primary text-on-primary'
                           : 'bg-surface border border-border text-secondary hover:text-foreground hover:border-foreground/30'}`}
@@ -111,27 +134,39 @@ export default function App() {
               </div>
 
               {/* Custom model input (shown when Custom is selected or model doesn't match presets) */}
-              {(!PRESET_MODELS.some((m) => m.id && m.id === modelInput) || modelInput === '') && (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                  <label htmlFor="custom-model" className="text-xs font-medium text-secondary whitespace-nowrap">
-                    Custom Model ID
-                  </label>
-                  <input
-                    id="custom-model"
-                    type="text"
-                    value={modelInput}
-                    onChange={(e) => setModelInput(e.target.value)}
-                    placeholder="accounts/fireworks/models/your-model-name"
-                    className="flex-1 w-full px-3 py-1.5 rounded-lg border border-border bg-surface text-sm text-foreground
-                      placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  />
-                  <button
-                    onClick={handleSaveModel}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-on-primary hover:brightness-110
-                      transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                  >
-                    Apply Model
-                  </button>
+              {isCustomMode && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <label htmlFor="custom-model" className="text-xs font-medium text-secondary whitespace-nowrap">
+                      Custom Model ID
+                    </label>
+                    <input
+                      id="custom-model"
+                      type="text"
+                      value={modelInput}
+                      onChange={(e) => setModelInput(e.target.value)}
+                      placeholder="accounts/fireworks/models/your-model-name"
+                      className="flex-1 w-full px-3 py-1.5 rounded-lg border border-border bg-surface text-sm text-foreground
+                        placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    />
+                    <button
+                      onClick={handleSaveModel}
+                      disabled={!modelInput.trim()}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-on-primary hover:brightness-110
+                        disabled:opacity-40 disabled:cursor-not-allowed
+                        transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    >
+                      Apply Model
+                    </button>
+                  </div>
+                  {modelSaved && (
+                    <p className="text-xs text-green-500 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      Model saved successfully!
+                    </p>
+                  )}
                 </div>
               )}
 

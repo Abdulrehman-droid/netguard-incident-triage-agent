@@ -3,7 +3,7 @@ import ProgressBar from './ProgressBar';
 import PasteStep from './PasteStep';
 import AnalyzeStep from './AnalyzeStep';
 import ResultsStep from './ResultsStep';
-import { analyzeLogs } from '../lib/ai';
+import { analyzeLogs, getStoredModel } from '../lib/ai';
 import type { IncidentReport, WizardStep, LogFormat } from '../types';
 
 export default function Wizard() {
@@ -14,6 +14,8 @@ export default function Wizard() {
   const [selectedFormat, setSelectedFormat] = useState<LogFormat>('Firewall Logs');
   const [submittedLogs, setSubmittedLogs] = useState('');
 
+  const activeModel = getStoredModel();
+
   const handleAnalyze = async (format: LogFormat, logs: string) => {
     setIsLoading(true);
     setError(null);
@@ -22,7 +24,7 @@ export default function Wizard() {
     setCurrentStep('analyze');
 
     try {
-      const result = await analyzeLogs(format, logs);
+      const result = await analyzeLogs(format, logs, activeModel);
       setReport(result);
       setCurrentStep('results');
     } catch (err) {
@@ -82,7 +84,14 @@ export default function Wizard() {
 
       {/* Footer */}
       <p className="text-center text-xs text-secondary">
-        Powered by <span className="font-mono font-medium text-foreground">Llama 3.3 70B</span> on{' '}
+        Powered by{' '}
+        <span className="font-mono font-medium text-foreground">
+          {activeModel.includes('kimi-k2p7') ? 'Kimi K2P7 Code' :
+               activeModel.includes('deepseek-v3') ? 'DeepSeek V3' :
+               activeModel.includes('deepseek-r1') ? 'DeepSeek R1' :
+               activeModel.split('/').pop()?.replace(/-/g, ' ') || activeModel}
+        </span>{' '}
+        on{' '}
         <span className="font-medium text-primary">Fireworks AI</span>
       </p>
     </div>
