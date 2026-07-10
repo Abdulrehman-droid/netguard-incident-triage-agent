@@ -118,6 +118,7 @@ export const DIAGNOSTIC_MODELS = [
   // Only models deployed on this account
   { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
   { label: 'GLM 5P2', id: 'accounts/fireworks/models/glm-5p2' },
+  { label: 'DeepSeek V4 Pro', id: 'accounts/fireworks/models/deepseek-v4-pro' },
 ];
 
 export async function analyzeLogs(

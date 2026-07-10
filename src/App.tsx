@@ -14,6 +14,7 @@ interface DiagResult {
 const PRESET_MODELS = [
   { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
   { label: 'GLM 5P2', id: 'accounts/fireworks/models/glm-5p2' },
+  { label: 'DeepSeek V4 Pro', id: 'accounts/fireworks/models/deepseek-v4-pro' },
   { label: 'Custom', id: '' },
 ];
 
@@ -43,7 +44,9 @@ export default function App() {
   }
 
   function handleCustomClick() {
-    setModelInput('');
+    const stored = getStoredModel();
+    const isAlreadyCustom = !PRESET_MODELS.some((m) => m.id && m.id === stored);
+    setModelInput(isAlreadyCustom ? stored : '');
   }
 
   const isCustomMode = !PRESET_MODELS.some((m) => m.id && m.id === modelInput);
@@ -84,6 +87,7 @@ export default function App() {
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               {getStoredModel().includes('kimi-k2p7') ? 'Kimi K2P7' :
                getStoredModel().includes('glm-5p2') ? 'GLM 5P2' :
+               getStoredModel().includes('deepseek-v4') ? 'DeepSeek V4' :
                getStoredModel().split('/').pop()?.slice(0, 18) || 'Model'}
             </span>
 
@@ -120,10 +124,14 @@ export default function App() {
                       onClick={() => m.id ? handleModelSelect(m.id) : handleCustomClick()}
                       className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 hover:scale-[0.97] active:scale-[0.95]
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
-                        ${!m.id ? 'text-tertiary italic' : ''}
-                        ${modelInput === m.id
-                          ? 'bg-primary text-on-primary'
-                          : 'bg-surface border border-border text-secondary hover:text-foreground hover:border-foreground/30'}`}
+                        ${!m.id ? 'italic' : ''}
+                        ${m.id
+                          ? modelInput === m.id
+                            ? 'bg-primary text-on-primary'
+                            : 'bg-surface border border-border text-secondary hover:text-foreground hover:border-foreground/30'
+                          : isCustomMode
+                            ? 'bg-primary/15 text-primary border border-primary/30'
+                            : 'text-tertiary border border-transparent'}`}
                     >
                       {m.label}
                     </button>
