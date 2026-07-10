@@ -1,0 +1,1 @@
+# netguard-incident-triage-agent
