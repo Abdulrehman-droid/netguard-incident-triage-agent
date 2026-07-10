@@ -87,8 +87,7 @@ export default function Wizard() {
         Powered by{' '}
         <span className="font-mono font-medium text-foreground">
           {activeModel.includes('kimi-k2p7') ? 'Kimi K2P7 Code' :
-               activeModel.includes('deepseek-v3') ? 'DeepSeek V3' :
-               activeModel.includes('deepseek-r1') ? 'DeepSeek R1' :
+               activeModel.includes('glm-5p2') ? 'GLM 5P2' :
                activeModel.split('/').pop()?.replace(/-/g, ' ') || activeModel}
         </span>{' '}
         on{' '}

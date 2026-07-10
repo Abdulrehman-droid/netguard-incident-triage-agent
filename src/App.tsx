@@ -13,8 +13,7 @@ interface DiagResult {
 
 const PRESET_MODELS = [
   { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
-  { label: 'DeepSeek V3', id: 'accounts/fireworks/models/deepseek-v3' },
-  { label: 'DeepSeek R1', id: 'accounts/fireworks/models/deepseek-r1' },
+  { label: 'GLM 5P2', id: 'accounts/fireworks/models/glm-5p2' },
   { label: 'Custom', id: '' },
 ];
 
@@ -84,8 +83,7 @@ export default function App() {
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted border border-border text-xs text-secondary font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               {getStoredModel().includes('kimi-k2p7') ? 'Kimi K2P7' :
-               getStoredModel().includes('deepseek-v3') ? 'DeepSeek V3' :
-               getStoredModel().includes('deepseek-r1') ? 'DeepSeek R1' :
+               getStoredModel().includes('glm-5p2') ? 'GLM 5P2' :
                getStoredModel().split('/').pop()?.slice(0, 18) || 'Model'}
             </span>
 

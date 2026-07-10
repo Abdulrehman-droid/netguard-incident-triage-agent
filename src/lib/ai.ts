@@ -117,8 +117,7 @@ export async function testModel(modelId: string): Promise<{ ok: boolean; status:
 export const DIAGNOSTIC_MODELS = [
   // Only models deployed on this account
   { label: 'Kimi K2P7 Code', id: 'accounts/fireworks/models/kimi-k2p7-code' },
-  { label: 'DeepSeek V3', id: 'accounts/fireworks/models/deepseek-v3' },
-  { label: 'DeepSeek R1', id: 'accounts/fireworks/models/deepseek-r1' },
+  { label: 'GLM 5P2', id: 'accounts/fireworks/models/glm-5p2' },
 ];
 
 export async function analyzeLogs(
