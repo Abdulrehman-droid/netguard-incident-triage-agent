@@ -1,0 +1,31 @@
+# ── Version control ─────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+
+# ── Node / dependencies ─────────────────────────────────────
+node_modules
+npm-debug.log*
+
+# ── Build output ────────────────────────────────────────────
+dist
+build
+
+# ── Environment files (secrets) ────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── IDE / editor ────────────────────────────────────────────
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# ── OS artifacts ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docs (not needed at runtime) ────────────────────────────
+*.md
