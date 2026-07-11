@@ -205,16 +205,6 @@ The generated incident report includes:
 
 ---
 
-## Team
-
-**Abdul Rehman**
-
-GitHub: https://github.com/Abdulrehman-droid
-
-LinkedIn: https://www.linkedin.com/in/abdulrehman/
-
----
-
 ## Hackathon
 
 This project was developed for the **AMD Developer Hackathon – ACT II** hosted by lablab.ai.
